@@ -1,118 +1,118 @@
 # LoopusBrowser
 
-> LoopusBrowser 当前处于 Beta 阶段。项目后续将根据开发进度逐步开放部分源代码；当前仅开放已发布的二进制文件，暂不公开完整源代码。
+> LoopusBrowser is currently in Beta. Parts of the source code may be released progressively as the project evolves. At this stage, only released binary files are publicly available; the complete source code is not currently open source.
 
-LoopusBrowser 是一款面向 Windows 的高性能指纹浏览器管理工具，专注于创建、维护和长期使用多个相互隔离的浏览器身份。
+LoopusBrowser is a high-performance Windows fingerprint browser manager designed for creating, maintaining, and operating multiple isolated browser identities.
 
-它不是一个简单的浏览器多开工具，而是一个完整的浏览器身份管理系统。LoopusBrowser 将浏览器 Profile、指纹配置、网络出口、扩展、浏览器引擎和运行状态作为一个统一整体进行管理，帮助用户更稳定地维护多个长期浏览器环境。
+It is more than a multi-browser launcher. LoopusBrowser treats the browser Profile, fingerprint configuration, network route, extensions, browser engine, and runtime state as one unified identity system, helping users maintain multiple long-lived browser environments with greater consistency and control.
 
-## 核心优势
+## Core Advantages
 
-### 原生 Rust 架构
+### Native Rust Architecture
 
-LoopusBrowser 使用 Rust 构建核心业务、浏览器运行时和数据管理能力，并使用 Tauri 构建 Windows 桌面界面。
+LoopusBrowser uses Rust for its core application logic, browser runtime, process management, and data services, with Tauri providing the Windows desktop shell.
 
-Rust 的原生编译、低运行时开销和优秀的并发处理能力，使 LoopusBrowser 具备：
+Rust's native compilation, low runtime overhead, memory safety, and efficient concurrency model provide:
 
-- 更低的管理层内存占用
-- 更快的应用启动速度
-- 更高效的进程和文件操作
-- 更稳定的长时间运行能力
-- 更适合多环境并行管理的底层架构
+- Lower memory usage for the management layer
+- Faster application startup
+- Efficient process and file operations
+- Better long-running stability
+- A stronger foundation for managing multiple environments in parallel
 
-Tauri 使用系统 WebView2 承载界面，不额外打包一套完整 Chromium 作为应用界面运行时，从而降低桌面管理程序本身的体积和基础资源消耗。
+The Tauri shell uses the system WebView2 runtime instead of shipping another complete Chromium runtime for the application interface. This keeps the desktop manager smaller and reduces its baseline resource consumption.
 
-浏览器网页进程的实际资源占用仍取决于网页内容、扩展、代理和浏览器引擎版本，但 LoopusBrowser 的管理层保持轻量，并通过受控并发避免资源失控。
+The resource usage of individual browser environments still depends on web pages, extensions, proxy conditions, and browser engine versions. LoopusBrowser keeps the management layer lightweight and uses controlled concurrency to prevent resource usage from growing unpredictably.
 
-### 可持续的浏览器身份
+### Persistent Browser Identities
 
-每个浏览器环境都拥有独立的：
+Each browser environment has its own:
 
-- Profile 和浏览数据
-- Cookie、Local Storage、IndexedDB
-- 指纹配置和指纹修订记录
-- 网络出口和代理配置
-- 浏览器扩展
-- 浏览器引擎版本
+- Profile and browsing data
+- Cookies, Local Storage, and IndexedDB
+- Fingerprint configuration and revision history
+- Network and proxy configuration
+- Browser extensions
+- Browser engine version
 
-用户可以长期保存、复制、备份和恢复浏览器环境，在应用更新、浏览器引擎升级或计算机重启后继续使用同一个浏览器身份。
+Environments can be preserved, duplicated, backed up, and restored, allowing users to continue using the same browser identity after application updates, engine upgrades, or system restarts.
 
-### 指纹、网络和数据的一致性管理
+### Consistent Fingerprint and Network Management
 
-LoopusBrowser 不只是简单堆叠指纹参数，而是将指纹、网络和浏览器数据作为一个整体进行检查和管理。
+LoopusBrowser does not simply expose a large collection of fingerprint flags. It manages fingerprint, network, and browser data as a connected system.
 
-系统可以根据实际网络出口辅助配置：
+Network-aware configuration can be used to determine or assist with:
 
-- 语言和地区
-- 时区
-- 平台
-- 视口尺寸
-- WebRTC 策略
-- 浏览器启动参数
+- Locale and language
+- Time zone
+- Platform
+- Viewport size
+- WebRTC policy
+- Browser launch parameters
 
-浏览器首次启动后，LoopusBrowser 还可以读取实际运行参数并生成身份快照，帮助用户确认配置是否真正生效。
+After the first launch, LoopusBrowser can inspect the actual browser runtime and create an identity snapshot, making it possible to verify whether the requested configuration is actually active.
 
-### 高效且可控的多环境运行
+### Efficient and Controlled Multi-Environment Operation
 
-LoopusBrowser 使用事件驱动的浏览器进程管理方式，并具备：
+LoopusBrowser uses an event-driven browser lifecycle and provides:
 
-- 独立浏览器进程
-- Profile 级别的操作系统锁
-- Windows Job Objects 进程归属
-- CDP 启动就绪检测
-- 崩溃和异常退出同步
-- 可配置的并行启动数量
-- 受控的代理批量检测
-- 引擎下载任务复用
+- Isolated browser processes
+- OS-level Profile locks
+- Windows Job Object ownership
+- CDP readiness detection
+- Crash and unexpected-exit synchronization
+- Configurable parallel launch limits
+- Bounded proxy health checks
+- Shared engine download tasks
 
-这使它更适合管理几十个甚至更多长期浏览器环境，同时避免无限启动进程造成的 CPU、内存和磁盘资源失控。
+This architecture is designed for managing dozens or more long-lived browser environments while avoiding uncontrolled CPU, memory, and disk usage caused by unlimited process creation.
 
-### 安全可靠的浏览器引擎管理
+### Verifiable Browser Engine Management
 
-LoopusBrowser 支持 Stable、Canary 和固定版本浏览器引擎共存，并提供：
+LoopusBrowser supports Stable, Canary, and pinned browser engine versions with:
 
-- 断点续传
-- SHA-256 校验
-- 启动自检
-- 安全解压
-- 原子激活
-- 版本回滚
-- 中断恢复
-- 运行中的环境不强制切换引擎
+- Resumable downloads
+- SHA-256 verification
+- Startup smoke tests
+- Safe extraction
+- Atomic activation
+- Version rollback
+- Interrupted-operation recovery
+- No forced engine switching for running environments
 
-浏览器引擎更新不再是一次不可逆的替换操作，而是一个可验证、可恢复的版本管理过程。
+Engine updates become a verifiable and recoverable version-management process instead of an irreversible file replacement.
 
-### 安全的数据隔离和恢复
+### Secure Isolation and Recovery
 
-不同用户和浏览器环境使用物理隔离的数据目录和本地数据库。
+Different users and browser environments use physically separated data roots and local databases.
 
-代理凭据、会话信息和其他敏感数据使用 Windows Credential Manager、DPAPI 和加密备份机制进行保护。环境恢复时会先写入临时区域，验证完成后再提交，不会直接覆盖已有身份。
+Proxy credentials, sessions, and sensitive data are protected using Windows Credential Manager, DPAPI, and encrypted backup mechanisms. Environment restoration is performed through staging and verification before being committed, preventing existing identities from being overwritten accidentally.
 
-## 主要功能
+## Main Features
 
-- 创建、编辑、复制、归档和恢复浏览器环境
-- 稳定生成、固定种子和随机启动指纹模式
-- HTTP、SOCKS5 代理和代理池管理
-- 代理认证、批量导入、出口 IP 和延迟检测
-- 扩展导入、权限查看、哈希识别和环境分配
-- 有头模式和无头模式
-- Stable、Canary 和固定浏览器引擎版本
-- 加密环境备份和恢复
-- 浏览器进程生命周期管理
-- 应用程序签名更新和版本校验
-- Windows 原生桌面体验
+- Create, edit, duplicate, archive, and restore browser environments
+- Stable, fixed-seed, and random-per-launch fingerprint modes
+- HTTP, SOCKS5, and managed proxy pools
+- Proxy authentication, batch import, exit-IP, and latency checks
+- Extension import, permission review, hashing, and assignment
+- Headed and headless browser modes
+- Stable, Canary, and pinned browser engine versions
+- Encrypted environment backup and restore
+- Browser process lifecycle management
+- Signed application updates and release verification
+- Native Windows desktop experience
 
-## Beta 状态
+## Beta Status
 
-LoopusBrowser 当前处于 Beta 阶段，功能、性能和兼容性仍在持续改进。
+LoopusBrowser is currently in Beta. Features, performance, and compatibility are still being actively improved.
 
-当前公开内容包括：
+The public repository currently provides:
 
-- Windows 安装程序
-- 便携版或其他已发布二进制文件
-- 版本说明
-- 文件哈希和签名信息
+- Windows installers
+- Portable builds or other released binaries
+- Release notes
+- File hashes and signature information
 
-已发布版本目前免费提供。源代码暂未公开，后续将根据项目发展逐步决定开放范围。
+Released versions are currently available for free. The source code is not publicly available at this time, and the scope of future source releases will be determined progressively as the project develops.
 
-LoopusBrowser 不保证匿名性，也不承诺绕过任何网站的安全策略、风控系统或访问限制。用户应自行遵守适用法律法规以及相关网站和服务的使用条款。
+LoopusBrowser does not guarantee anonymity or bypassing any website's security, risk-control, or access policies. Users are responsible for complying with applicable laws and the terms of the websites and services they use.
